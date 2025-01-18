@@ -2,14 +2,11 @@ FROM node:alpine AS development
 
 ENV NODE_ENV development
 
-WORKDIR /app
-
-COPY ./package*.json /app/
-
-RUN npm install
+WORKDIR /frontend
 
 COPY . .
+RUN npm install
 
-EXPOSE 5173
+EXPOSE ${FRONTEND_CONTAINER_PORT}
 
 CMD ["npm","run","dev"]

@@ -9,13 +9,13 @@ services:
       - ${FRONTEND_HOST_PORT}:${FRONTEND_CONTAINER_PORT}
     depends_on:
       - backend
-      
+
   backend:
     image: backend
     container_name: backend
     build: ./backend
     depends_on:
-      - database
+      - mongodb
     env_file:
       - .env
     volumes:
@@ -23,16 +23,17 @@ services:
     ports:
       - ${BACKEND_HOST_PORT}:${BACKEND_CONTAINER_PORT}
 
-  database:
-    image: mysql:8.3.0
-    container_name: database
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
     env_file:
       - .env
-    volumes:
-      - ./database:/docker-entrypoint-initdb.d
-      - db:/var/lib/mysql
     ports:
       - ${DATABASE_HOST_PORT}:${DATABASE_CONTAINER_PORT}
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - db:/data/db
+    command: --quiet --logpath /dev/null
 
 volumes:
   db:

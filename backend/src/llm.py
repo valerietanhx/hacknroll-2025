@@ -12,8 +12,8 @@ def begin_conv(theme="fantasy") -> tuple[str, list]:
         {
             "role": "system",
             "content": f"You are a story-teller for a text adventure game, which the user is going to play. \
-                Your role is to tell a story. After every turn, present the user with 4 choices numbered 1 to 4. \
-                    The user must choose one of the four options. Continue the story following the users choice. \
+                Your role is to tell a story. After every turn, present the user with 4 choices numbered 1 to 4 if the main character is alive. \
+                    The user must choose one of the four options. Continue the story following the users choice. If the main character is dead, conclude the story. \
             No text formatting is required. Now begin the story with an exciting introduction. The story has a {theme} theme.",
         }
     ]
@@ -27,7 +27,7 @@ def begin_conv(theme="fantasy") -> tuple[str, list]:
     conv_hist.append({"role": "assistant", "content": output})
     return output, conv_hist
 
-def generate_story(conversation_history: list, user_choice: str, stats: str) -> tuple[str, list]:
+def generate_story(conversation_history: list, user_choice: str, stats: str) -> tuple[str, list, str]:
     '''stats to be a string but in dictionary format, output of check_story. in the main game loop initialise stats to empty dict {} (as a string) 
     and pass it to this func'''
     conversation_history.append({"role": "user", "content": user_choice})
@@ -42,7 +42,7 @@ def generate_story(conversation_history: list, user_choice: str, stats: str) -> 
     )
     output = response.choices[0].message.content
     conversation_history.append({"role": "assistant", "content": output})
-    return output, conversation_history
+    return output, conversation_history, updated_stats
 
 def check_story(conversation_history: list, curr_stats: dict):
     """check current stats and stuff"""

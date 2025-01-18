@@ -19,19 +19,43 @@ def main():
     return "Hello, World!"
 
 
-@app.route("/create")
+@app.route("/adventure", methods=["POST"])
 def create():
     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
 
     # Dummy adventure for testing
-    adventure = {
+    default_adventure = {
         "stats": {"main": {"health": 100, "power": 0}},
         "stories": [{"role": "user", "content": "story"}],
     }
 
-    document_id = mongo.create(adventure)
+    document_id = mongo.create(default_adventure)
     mongo.close_connection()
-    return f"Inserted document with ID: {document_id}"
+    return document_id
+
+
+@app.route("/adventure/<str:document_id>", methods=["GET"])
+def retrieve(document_id):
+    mongo = MongoDBHelper(connection_string, mongodb_db, collection)
+    document = mongo.retrieve(document_id)
+    mongo.close_connection()
+    return document
+
+
+@app.route("/adventure/<str:document_id>", methods=["PATCH"])
+def update(document_id):
+    mongo = MongoDBHelper(connection_string, mongodb_db, collection)
+    is_successful = mongo.update(document_id, {})
+    mongo.close_connection()
+    return is_successful
+
+
+@app.route("/adventure/<str:document_id>", methods=["DELETE"])
+def delete(document_id):
+    mongo = MongoDBHelper(connection_string, mongodb_db, collection)
+    is_successful = mongo.delete(document_id)
+    mongo.close_connection()
+    return is_successful
 
 
 if __name__ == "__main__":

@@ -1,0 +1,38 @@
+services:
+  frontend:
+    image: frontend
+    container_name: frontend
+    build: ./frontend
+    env_file:
+      - .env
+    ports:
+      - ${FRONTEND_HOST_PORT}:${FRONTEND_CONTAINER_PORT}
+    depends_on:
+      - backend
+      
+  backend:
+    image: backend
+    container_name: backend
+    build: ./backend
+    depends_on:
+      - database
+    env_file:
+      - .env
+    volumes:
+      - ./backend/logs:/backend/logs
+    ports:
+      - ${BACKEND_HOST_PORT}:${BACKEND_CONTAINER_PORT}
+
+  database:
+    image: mysql:8.3.0
+    container_name: database
+    env_file:
+      - .env
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - db:/var/lib/mysql
+    ports:
+      - ${DATABASE_HOST_PORT}:${DATABASE_CONTAINER_PORT}
+
+volumes:
+  db:

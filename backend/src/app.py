@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask
-from src.mongo import MongoDBHelper
+from mongo import MongoDBHelper
 
 app = Flask(__name__)
 
@@ -37,7 +37,7 @@ def create():
     return document_id
 
 
-@app.route("/adventure/<str:document_id>", methods=["GET"])
+@app.route("/adventure/<document_id>", methods=["GET"])
 def retrieve(document_id):
     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
     document = mongo.retrieve(document_id)
@@ -45,7 +45,7 @@ def retrieve(document_id):
     return document
 
 
-@app.route("/adventure/<str:document_id>", methods=["PATCH"])
+@app.route("/adventure/<document_id>", methods=["PATCH"])
 def update(document_id):
     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
     is_successful = mongo.update(document_id, {})
@@ -53,12 +53,13 @@ def update(document_id):
     return is_successful
 
 
-@app.route("/adventure/<str:document_id>", methods=["DELETE"])
+@app.route("/adventure/<document_id>", methods=["DELETE"])
 def delete(document_id):
     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
     is_successful = mongo.delete(document_id)
     mongo.close_connection()
     return is_successful
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=BACKEND_CONTAINER_PORT)

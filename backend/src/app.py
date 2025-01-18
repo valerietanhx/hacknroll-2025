@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask
-from mongo import MongoDBHelper
+from src.mongo import MongoDBHelper
 
 app = Flask(__name__)
 

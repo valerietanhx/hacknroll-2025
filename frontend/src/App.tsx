@@ -12,8 +12,14 @@ function App() {
   const [stats, setStats] = useState({
     health: 100,
     mana: 50,
-    abilities: ["Fireball", "Heal", "Teleport"],
+    abilities: [
+      { name: "Fireball", description: "Launches a fiery ball of flame.", damage: 50, manaCost: 20 },
+      { name: "Heal", description: "Restores health to yourself or an ally.", damage: 0, manaCost: 10 },
+      { name: "Teleport", description: "Instantly move to another location.", damage: 0, manaCost: 30 },
+    ],
   });
+
+  const [hoveredAbility, setHoveredAbility] = useState(null);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);

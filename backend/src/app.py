@@ -1,9 +1,13 @@
+import json
 import os
 
-from flask import Flask
+import src.llm as llm
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 from src.mongo import MongoDBHelper
 
 app = Flask(__name__)
+CORS(app)
 
 BACKEND_CONTAINER_PORT = os.getenv("BACKEND_CONTAINER_PORT", "5000")
 mongodb_username = os.getenv("MONGO_INITDB_ROOT_USERNAME", "root")
@@ -19,46 +23,65 @@ def main():
     return "Hello, World!"
 
 
-@app.route("/adventure", methods=["POST"])
+@app.route("/adventure", methods=["GET"])
 def create():
 
-    # TODO: Add LLM generation of story and power
+    output, conv_hist = llm.begin_conv()
+    checked = llm.check_story(conv_hist, {})
+    stats = json.loads(checked)
 
     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
 
-    # TODO: update based on LLM's generated story and power
     adventure = {
-        "stats": {"main": {"health": 100, "power": 0}},
-        "story": [],
+        "stats": stats,
+        "story": conv_hist,
     }
 
     document_id = mongo.create(adventure)
     mongo.close_connection()
-    return document_id
+
+    return jsonify({"stats": stats, "output": output, "document_id": document_id}), 200
 
 
 @app.route("/adventure/<document_id>", methods=["GET"])
-def retrieve(document_id):
+def continue_adventure(document_id):
+    userInput = request.args.get("input")  # using query parameter
+
+    print(userInput)
+
     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
     document = mongo.retrieve(document_id)
+
+    output, conv_hist = llm.generate_story(
+        document["story"], userInput, document["stats"]
+    )
+    stats = json.loads(llm.check_story(conv_hist, document["stats"]))
+
+    adventure = {
+        "stats": stats,
+        "story": conv_hist,
+    }
+
+    mongo.update(document_id, adventure)
     mongo.close_connection()
-    return document
+
+    return jsonify({"stats": stats, "output": output}), 200
 
 
-@app.route("/adventure/<document_id>", methods=["PATCH"])
-def update(document_id):
-    mongo = MongoDBHelper(connection_string, mongodb_db, collection)
-    is_successful = mongo.update(document_id, {})
-    mongo.close_connection()
-    return is_successful
+# @app.route("/adventure/<document_id>", methods=["PATCH"])
+# def update(document_id):
+#     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
+#     is_successful = mongo.update(document_id, {})
+#     mongo.close_connection()
+#     return is_successful
 
 
-@app.route("/adventure/<document_id>", methods=["DELETE"])
-def delete(document_id):
-    mongo = MongoDBHelper(connection_string, mongodb_db, collection)
-    is_successful = mongo.delete(document_id)
-    mongo.close_connection()
-    return is_successful
+# @app.route("/adventure/<document_id>", methods=["DELETE"])
+# def delete(document_id):
+#     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
+#     is_successful = mongo.delete(document_id)
+#     mongo.close_connection()
+#     return is_successful
 
 
 if __name__ == "__main__":

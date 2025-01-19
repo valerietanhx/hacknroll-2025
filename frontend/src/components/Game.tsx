@@ -1,29 +1,59 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Stats } from "../utils/types";
 
 export default function Game() {
   const [input, setInput] = useState("");
-  const [log, setLog] = useState([
-    "You are inside the small building. You discover that this is a one-room house. There are broken windows in all four walls. There is debris spread over the entire floor, and it is obvious that there hasn't been anyone here for a long time. Over in the corner, there is a large open trophy case. There is a large rug covering most of the floor. There is a large gas lamp.",
-    "",
-    "What would you like to do?",
-  ]);
-  const [stats, setStats] = useState<Stats>({
-    health: 100,
-    power: 0,
-  });
-  
+  const [log, setLog] = useState<String[]>([]);
+  const [stats, setStats] = useState<Stats>({});
+  const [documentId, setDocumentId] = useState(-1);
+
+  const backendHost = import.meta.env.VITE_BACKEND_HOST;
+  const backendPort = import.meta.env.VITE_BACKEND_CONTAINER_PORT;
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
       setLog([...log, `> ${input}`]);
       setInput("");
+
+      const apiUrl = `${backendHost}:${backendPort}/adventure/${documentId}?input=${input}`;
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "GET",
+        });
+        if (!response.ok) {
+          throw new Error(`${response.status}`);
+        }
+        const data = await response.json();
+        setStats(data.stats);
+        setLog([...log, data.output]);
+      } catch (err: any) {}
     }
   };
+
+  useEffect(() => {
+    const apiUrl = `${backendHost}:${backendPort}/adventure`;
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error(`${response.status}`);
+        }
+        const data = await response.json();
+        setStats(data.stats);
+        setLog([...log, data.output]);
+        setDocumentId(data.document_id);
+      } catch (err) {}
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="body">
@@ -31,12 +61,18 @@ export default function Game() {
         {/* Stats Section */}
         <div className="stats-container">
           <h2>Stats</h2>
-          <p>
-            <strong>Health:</strong> {stats.health}
-          </p>
-          <p>
-            <strong>Power:</strong> {stats.power}
-          </p>
+          {stats &&
+            Object.entries(stats).map(([characterName, stat]) => (
+              <div key={characterName}>
+                <h3>{characterName}</h3>
+                <p>
+                  <strong>Health:</strong> {stat.health}
+                </p>
+                <p>
+                  <strong>Power:</strong> {stat.power}
+                </p>
+              </div>
+            ))}
         </div>
         {/* Game Section */}
         <div className="game-content">

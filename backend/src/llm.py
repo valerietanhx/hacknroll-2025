@@ -34,7 +34,8 @@ def generate_story(conversation_history: list, user_choice: str, stats: str) -> 
     analysis_history = conversation_history.copy()
 
     updated_stats = check_story(analysis_history, stats)
-    analysis_history.append({"role": "user", "content": f"The stats of all relevant characters (including the main character, denoted as main, is as follows {updated_stats})"})
+    analysis_history.append({"role": "user", "content": f"The stats of all relevant characters (including the main character, denoted as main, is as follows {updated_stats}). 
+                             Continue generating the story without explicitly mentioning numerical statistics."})
     client = Together()
     response = client.chat.completions.create(
         model=os.environ.get("LLM"),

@@ -47,8 +47,6 @@ def create():
 def continue_adventure(document_id):
     userInput = request.args.get("input")  # using query parameter
 
-    print(userInput)
-
     mongo = MongoDBHelper(connection_string, mongodb_db, collection)
     document = mongo.retrieve(document_id)
 

@@ -5,7 +5,6 @@ export default function Game() {
   const [input, setInput] = useState("");
   const [log, setLog] = useState<String[]>([]);
   const [stats, setStats] = useState<Stats>({});
-  const [isStarted, setIsStarted] = useState(true);
   const [documentId, setDocumentId] = useState(-1);
 
   const backendHost = import.meta.env.VITE_BACKEND_HOST;
@@ -21,8 +20,6 @@ export default function Game() {
       setLog([...log, `> ${input}`]);
       setInput("");
 
-      console.log(documentId);
-
       const apiUrl = `${backendHost}:${backendPort}/adventure/${documentId}?input=${input}`;
 
       try {
@@ -33,7 +30,6 @@ export default function Game() {
           throw new Error(`${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
         setStats(data.stats);
         setLog([...log, data.output]);
       } catch (err: any) {}
@@ -53,12 +49,11 @@ export default function Game() {
         setStats(data.stats);
         setLog([...log, data.output]);
         setDocumentId(data.document_id);
-        setIsStarted(true);
       } catch (err) {}
     };
 
     fetchData();
-  }, [isStarted]);
+  }, []);
 
   return (
     <div className="body">

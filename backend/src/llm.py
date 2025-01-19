@@ -38,7 +38,8 @@ def generate_story(
     analysis_history.append(
         {
             "role": "user",
-            "content": f"The stats of all relevant characters (including the main character, denoted as main, is as follows {stats})",
+            "content": f"The stats of all relevant characters (including the main character, denoted as main, is as follows {stats}). 
+            Continue generating the story without explicitly mentioning numerical statistics.",
         }
     )
     client = Together()

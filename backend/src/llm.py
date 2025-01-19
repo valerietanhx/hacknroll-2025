@@ -30,7 +30,7 @@ def begin_conv(theme="fantasy") -> tuple[str, list]:
 def generate_story(conversation_history: list, user_choice: str, stats: str) -> tuple[str, list, str]:
     '''stats to be a string but in dictionary format, output of check_story. in the main game loop initialise stats to empty dict {} (as a string) 
     and pass it to this func'''
-    conversation_history.append({"role": "user", "content": user_choice})
+    conversation_history.append({"role": "user", "content": f"Choice: {user_choice}\n"})
     analysis_history = conversation_history.copy()
 
     updated_stats = check_story(analysis_history, stats)

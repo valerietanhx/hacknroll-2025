@@ -38,7 +38,7 @@ def generate_story(
     analysis_history.append(
         {
             "role": "user",
-            "content": f"The stats of all relevant characters (including the main character, denoted as main, is as follows {stats}). 
+            "content": f"The stats of all relevant characters (including the main character, denoted as main, is as follows {stats}). \
             Continue generating the story without explicitly mentioning numerical statistics.",
         }
     )
@@ -49,7 +49,7 @@ def generate_story(
     )
     output = response.choices[0].message.content
     conversation_history.append({"role": "assistant", "content": output})
-    return output, conversation_history, updated_stats
+    return output, conversation_history
 
 
 def check_story(conversation_history: list, curr_stats: dict):

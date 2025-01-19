@@ -62,7 +62,7 @@ Based on the latest update to the story, deduce whether a new character has been
 Also deduce if the main character (or "main" for short) has lost or gained health/power. If a character is dead, the health should be set to 0.
 Provide a summary of all updated stats in a code chunk. Here is an example:
 ```
-{"main": {"power": 500, "health": 100},  "goblin": {"power": 20, "health": 10}}
+{{"main": {{"power": 500, "health": 100}},  "goblin": {{"power": 20, "health": 10}}}}
 ```
 
 """,

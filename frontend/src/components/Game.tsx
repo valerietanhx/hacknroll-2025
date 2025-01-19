@@ -3,9 +3,10 @@ import { Stats } from "../utils/types";
 
 export default function Game() {
   const [input, setInput] = useState("");
-  const [log, setLog] = useState<String[]>([]);
+  const [log, setLog] = useState<String[]>(["Generating..."]);
   const [stats, setStats] = useState<Stats>({});
   const [documentId, setDocumentId] = useState(-1);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const backendHost = import.meta.env.VITE_BACKEND_HOST;
   const backendPort = import.meta.env.VITE_BACKEND_CONTAINER_PORT;
@@ -32,6 +33,11 @@ export default function Game() {
         const data = await response.json();
         setStats(data.stats);
         setLog([...log, data.output]);
+
+        if (data.stats.main.health <= 0) {
+          setIsDisabled(true);
+          setLog([...log, "You have died. Thank you for playing!"]);
+        }
       } catch (err: any) {}
     }
   };
@@ -87,6 +93,7 @@ export default function Game() {
               value={input}
               onChange={handleInput}
               placeholder="Type your command..."
+              disabled={isDisabled}
             />
             <button type="submit">Enter</button>
           </form>

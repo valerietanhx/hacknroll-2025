@@ -75,8 +75,6 @@ Provide a summary of all updated stats in a code chunk. Here is an example:
         }
     )
 
-    print(to_check)
-
     client = Together()
     response = client.chat.completions.create(
         model=os.environ.get("LLM"),
@@ -84,7 +82,6 @@ Provide a summary of all updated stats in a code chunk. Here is an example:
     )
     # Now we pass it through the llm and just extract the dict as a string
     ext = extract(response.choices[0].message.content)
-    print(ext)
     return ext
 
 
